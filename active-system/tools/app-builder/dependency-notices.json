@@ -22,5 +22,12 @@
     "sha256": "5b893305a717230e5b0024ff5ca3eec1dc05ba600c9b140730488d97ce56f1e6",
     "source": "https://raw.githubusercontent.com/styled-components/styled-components/v5.3.11/LICENSE",
     "license": "MIT"
+  },
+  "@jspreadsheet/formula@2.0.2": {
+    "path": "notices/jspreadsheet-formula-2.0.2.txt",
+    "sha256": "da5f8c431fb55032354b84e0c2380ca5e7aa9f8af632d33ff06ae8beb1fec48d",
+    "source": "https://github.com/jspreadsheet/formula-basic/blob/main/README.md",
+    "declaredLicense": "MIT",
+    "packageHeaderSHA256": "15b5bc386e354509e550d45b62852eba1288fd5e72010588f081e33f5eb7b0a4"
   }
 }
