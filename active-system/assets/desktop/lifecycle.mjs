@@ -12,6 +12,7 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
   const card=document.createElement('div');card.className='recovery-card';card.tabIndex=-1;card.append(spinner,title,message,clock,action,retry);layer.append(card);document.body.append(layer);
   const banner=document.createElement('button');banner.type='button';banner.id='maintenance-banner';banner.hidden=true;document.body.append(banner);
   let stopped=false,controller,timer,tick,epoch=null,notice=null,offset=0,failures=0,blocked=false,disconnected=initiallyDisconnected,acknowledged=null,restoring=false,previousFocus=null,healthy=false;
+  const startedAt=Date.now();let connectedOnce=false,offlineSeen=false;
   const priorInert=new Map();
   function block(value){
     if(blocked===value)return;blocked=value;document.documentElement.dataset.desktopBlocked=String(value);
@@ -28,6 +29,11 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
       if(!hasRunningGuest())message.textContent='Waiting for the server. This page has not restored a previous Linux session. After a reload or browser crash, reopen your last saved files when the server returns. Unsaved work from an earlier tab was not automatically saved.';
       if(restoring){title.textContent='Reconnecting your session';message.textContent='The server is back. Checking your session while keeping Linux and local drafts in this tab.';}
       clock.textContent=due?'Maintenance is in progress. We’ll keep trying.':'Trying again automatically…';
+      if(!due&&!restoring&&!initiallyDisconnected&&!connectedOnce&&!offlineSeen&&navigator.onLine&&failures<2&&Date.now()-startedAt<15000){
+        title.textContent='Preparing desktop';
+        message.textContent='Getting your desktop ready. This should only take a moment.';
+        clock.textContent='';retry.hidden=true;
+      }
     }else{
       block(false);spinner.hidden=true;retry.hidden=true;banner.hidden=!planned;
       if(planned){
@@ -60,13 +66,13 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
       if(n!==null&&(!n||n.version!=='codi-maintenance-notice/1'||typeof n.id!=='string'||!/^[a-f0-9]{32}$/.test(n.id)||!['scheduled','active','cancelled'].includes(n.phase)||!Number.isSafeInteger(n.deadline)||!Number.isSafeInteger(n.expiresAt)||n.expiresAt<n.deadline||n.expiresAt>n.deadline+86400||typeof n.message!=='string'||n.message.length>500))throw Error('Invalid maintenance notice');
       const changed=epoch!==null&&epoch!==state.epoch;healthy=true;failures=0;offset=state.serverTime-Date.now()/1000;notice=n;
       if(changed){restoring=true;render();await recoverSession();}
-      epoch=state.epoch;restoring=false;disconnected=!getGuestLink();render();
+      epoch=state.epoch;restoring=false;disconnected=!getGuestLink();if(!disconnected)connectedOnce=true;render();
     }catch(error){if(!stopped){healthy=false;if(++failures>=2){disconnected=true;render();}}}
     finally{clearTimeout(timeout);controller=null;if(!stopped)timer=setTimeout(poll,pollMs);}
   }
-  const offline=()=>{disconnected=true;render();};window.addEventListener('offline',offline);
+  const offline=()=>{offlineSeen=true;disconnected=true;render();};window.addEventListener('offline',offline);
   const online=()=>{clearTimeout(timer);if(!controller||controller.signal.aborted)poll();};window.addEventListener('online',online);
-  tick=setInterval(()=>{if(healthy&&!getGuestLink())disconnected=true;render();},250);render();poll();
+  tick=setInterval(()=>{if(healthy){if(!getGuestLink())disconnected=true;else connectedOnce=true;}render();},250);render();poll();
   return {get state(){return {blocked,disconnected,epoch,notice:notice?{id:notice.id,phase:notice.phase,deadline:notice.deadline}:null};},
     stop(){stopped=true;controller?.abort();clearTimeout(timer);clearInterval(tick);block(false);for(const name of guarded)document.removeEventListener(name,guard,true);window.removeEventListener('offline',offline);window.removeEventListener('online',online);window.removeEventListener('beforeunload',unload);layer.remove();banner.remove();}};
 }
