@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const defaults=path.resolve(here,'../..');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const ids=['calculator','files','help','terminal','text','personal-template'];
+const ids=['calculator','files','help','terminal','text','image-editor','personal-template'];
 const safeFile=/^(?:[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*\/)*[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*$/;
 const publicExtensions=new Set(['.mjs','.js','.css','.json','.txt','.wasm','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.ogg','.wav','.mp3']);
 const options=JSON.parse(await readFile(process.argv[2],'utf8'));
@@ -41,11 +41,14 @@ if(await realpath(output)!==output)throw Error('Symlinked output directory');
 const records=[];
 for(const id of selected){
   const entry=path.join(source,sourceEntries[id]??path.join(id,'index.mjs')),appRoot=path.dirname(entry);
+  const dependencyRoots=[path.join(appRoot,'node_modules'),dependencies];
   await regular(entry,[source]);
   let manifest={};
   try{await regular(path.join(appRoot,'app.json'),[appRoot]);manifest=JSON.parse(await readFile(path.join(appRoot,'app.json'),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
-  if(!manifest||Array.isArray(manifest)||Object.keys(manifest).some(key=>!['assets','workers'].includes(key)))throw Error('Invalid app.json fields');
+  if(!manifest||Array.isArray(manifest)||Object.keys(manifest).some(key=>!['assets','workers','inject'].includes(key)))throw Error('Invalid app.json fields');
   if(manifest.workers!==undefined&&(!manifest.workers||typeof manifest.workers!=='object'||Array.isArray(manifest.workers)))throw Error('Invalid worker map');
+  if(!Array.isArray(manifest.inject??[])||(manifest.inject??[]).length>8)throw Error('Invalid inject list');
+  const inject=[];for(const file of manifest.inject??[]){if(typeof file!=='string'||!safeFile.test(file)||!/[.](?:mjs|js)$/.test(file))throw Error('Invalid injected source');inject.push(await regular(path.resolve(appRoot,file),[appRoot]));}
   const entries={index:entry};
   for(const [name,file] of Object.entries(manifest.workers??{})){
     if(!/^[a-z][a-z0-9-]{0,31}$/.test(name)||typeof file!=='string'||!safeFile.test(file))throw Error('Invalid worker declaration');
@@ -54,22 +57,22 @@ for(const id of selected){
   const scratch=await mkdtemp(path.join(output,'.app-build-'));
   try{
     const importedAssets=new Map();
-    const result=await build({absWorkingDir:source,entryPoints:entries,outdir:scratch,bundle:true,splitting:true,format:'esm',platform:'browser',target:['es2022'],write:false,metafile:true,
-      outExtension:{'.js':'.mjs'},entryNames:'[dir]/[name]',chunkNames:'chunks/[name]-[hash]',assetNames:'media/[name]-[hash]',nodePaths:[dependencies],legalComments:'external',charset:'utf8',sourcemap:false,
+    const result=await build({absWorkingDir:source,inject,entryPoints:entries,outdir:scratch,bundle:true,splitting:true,format:'esm',platform:'browser',target:['es2022'],write:false,metafile:true,
+      outExtension:{'.js':'.mjs'},entryNames:'[dir]/[name]',chunkNames:'chunks/[name]-[hash]',assetNames:'media/[name]-[hash]',nodePaths:dependencyRoots,legalComments:'external',charset:'utf8',sourcemap:false,
       loader:{'.wasm':'file','.svg':'file','.png':'file','.jpg':'file','.jpeg':'file','.webp':'file','.gif':'file','.ico':'file','.woff':'file','.woff2':'file','.ttf':'file','.ogg':'file','.wav':'file','.mp3':'file'},
       logOverride:{'unsupported-dynamic-import':'error'},plugins:[{name:'public-input-boundary',setup(api){
         api.onResolve({filter:/\.(wasm|svg|png|jpg|jpeg|webp|gif|ico|woff2?|ttf|ogg|wav|mp3)$/},async args=>{
           if(!['import-statement','dynamic-import','require-call'].includes(args.kind))return undefined;
           const resolved=await api.resolve(args.path,{resolveDir:args.resolveDir,kind:'url-token'});
           if(resolved.errors.length)return {errors:resolved.errors};
-          const file=await regular(resolved.path,[source,dependencies]);return {path:file,namespace:'codi-asset-url'};
+          const file=await regular(resolved.path,[source,...dependencyRoots]);return {path:file,namespace:'codi-asset-url'};
         });
         api.onLoad({filter:/.*/,namespace:'codi-asset-url'},async args=>{
           const bytes=await readFile(args.path),digest=hash(bytes),name='media/'+digest+path.extname(args.path);
           const marker='__CODI_ASSET_'+digest+'__';importedAssets.set(marker,{name,bytes});
           return {contents:'export default new URL('+JSON.stringify(marker)+',import.meta.url).href;',loader:'js'};
         });
-        api.onLoad({filter:/.*/,namespace:'file'},async args=>{await regular(args.path,[source,dependencies],true);return undefined;});
+        api.onLoad({filter:/.*/,namespace:'file'},async args=>{await regular(args.path,[source,...dependencyRoots],true);return undefined;});
       }}]});
     for(const [file,metadata] of Object.entries(result.metafile.outputs)){
       if(metadata.imports.some(item=>item.external))throw Error('Unbundled external import in '+file);
@@ -102,10 +105,10 @@ for(const id of selected){
     // Retain notices for every imported npm package, including nested packages.
     const packages=new Map();
     for(const input of Object.keys(result.metafile.inputs)){
-      const absolute=path.resolve(source,input);if(!under(absolute,dependencies))continue;
+      const absolute=path.resolve(source,input),dependencyRoot=dependencyRoots.find(root=>under(absolute,root));if(!dependencyRoot)continue;
       let dir=path.dirname(absolute);
-      while(under(dir,dependencies)&&dir!==dependencies){
-        try{const file=await regular(path.join(dir,'package.json'),[dependencies]);const pkg=JSON.parse(await readFile(file,'utf8'));if(pkg.name&&pkg.version){packages.set(dir,pkg);break;}}catch(error){if(error.code!=='ENOENT')throw error;}
+      while(under(dir,dependencyRoot)&&dir!==dependencyRoot){
+        try{const file=await regular(path.join(dir,'package.json'),[dependencyRoot]);const pkg=JSON.parse(await readFile(file,'utf8'));if(pkg.name&&pkg.version){packages.set(dir,pkg);break;}}catch(error){if(error.code!=='ENOENT')throw error;}
         dir=path.dirname(dir);
       }
     }
@@ -124,7 +127,7 @@ for(const id of selected){
         put('licenses/'+label+'/LICENSE.txt',raw);
         put('licenses/'+label+'/provenance.json',Buffer.from(JSON.stringify(entry,null,2)+'\n'));
       }
-      for(const name of notices)put('licenses/'+label+'/'+name+'.txt',await readFile(await regular(path.join(dir,name),[dependencies])));
+      for(const name of notices)put('licenses/'+label+'/'+name+'.txt',await readFile(await regular(path.join(dir,name),dependencyRoots)));
     }
     const descriptions=Object.fromEntries([...files].sort(([a],[b])=>a.localeCompare(b,'en')).map(([name,bytes])=>[name,{sha256:hash(bytes),bytes:bytes.length}]));
     if(files.size>256||[...files.values()].reduce((sum,b)=>sum+b.length,0)>32*1024*1024)throw Error('App bundle exceeds file/size limits');

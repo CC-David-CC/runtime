@@ -16,5 +16,11 @@
     "sha256": "10c8da64ecfa3067cf9231e0ba19b8d7730e7fed3ac5eaa37ccb97c3c5e71336",
     "source": "https://raw.githubusercontent.com/react-dnd/react-dnd/641fd36c130e42c3cf08987924151efa1452bca7/LICENSE",
     "license": "MIT"
+  },
+  "styled-components@5.3.11": {
+    "path": "notices/styled-components-5.3.11.txt",
+    "sha256": "5b893305a717230e5b0024ff5ca3eec1dc05ba600c9b140730488d97ce56f1e6",
+    "source": "https://raw.githubusercontent.com/styled-components/styled-components/v5.3.11/LICENSE",
+    "license": "MIT"
   }
 }
