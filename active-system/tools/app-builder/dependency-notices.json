@@ -35,5 +35,11 @@
     "path": "notices/duckdb-wasm-1.32.0.txt",
     "sha256": "7e17fd31249fa875cb3b1c5e05c6c3e99b75509f6a2804ca176c217834de1dcb",
     "source": "https://github.com/duckdb/duckdb-wasm/blob/v1.32.0/LICENSE"
+  },
+  "@ffmpeg/core@0.12.10": {
+    "license": "GPL-2.0-or-later",
+    "path": "notices/ffmpeg-core-0.12.10.txt",
+    "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+    "source": "https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10"
   }
 }

@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const defaults=path.resolve(here,'../..');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const ids=['calculator','files','help','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','personal-template'];
+const ids=['calculator','files','help','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','personal-template'];
 const safeFile=/^(?:[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*\/)*[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*$/;
 const publicExtensions=new Set(['.mjs','.js','.css','.json','.txt','.wasm','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.ogg','.wav','.mp3']);
 const options=JSON.parse(await readFile(process.argv[2],'utf8'));

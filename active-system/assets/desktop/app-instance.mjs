@@ -17,7 +17,9 @@ export function mountApp(module,host){
     return errors;
   }
   try{
-    view=module.mount({...host,version:2,signal:controller.signal,onDispose});
+    const tools=host.tools&&{...host.tools};
+    if(tools?.createFFmpeg){const create=tools.createFFmpeg;tools.createFFmpeg=async (...args)=>{const tool=await create(...args);if(disposed){tool.dispose();throw Error('App view closed.');}onDispose(()=>tool.dispose());return tool;};}
+    view=module.mount({...host,tools,version:2,signal:controller.signal,onDispose});
     if(!view||!(view.element instanceof HTMLElement)||!view.element.classList.contains('window-content')||typeof view.dispose!=='function'||typeof view.then==='function')throw Error('App API 2 requires { element, dispose() }');
     return {element:view.element,signal:controller.signal,dispose};
   }catch(error){dispose('Mount failed');throw error;}
