@@ -41,5 +41,299 @@
     "path": "notices/ffmpeg-core-0.12.10.txt",
     "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
     "source": "https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10"
+  },
+  "@pdfme/generator@6.2.8": {
+    "license": "MIT",
+    "path": "notices/pdfme-6.2.8.txt",
+    "sha256": "d43121abfdaebee1e0d24ce91805811627df2cd27419cc86a13fae6a4e5d9069",
+    "source": "https://github.com/pdfme/pdfme/blob/main/LICENSE.md"
+  },
+  "@pdfme/common@6.2.8": {
+    "license": "MIT",
+    "path": "notices/pdfme-6.2.8.txt",
+    "sha256": "d43121abfdaebee1e0d24ce91805811627df2cd27419cc86a13fae6a4e5d9069",
+    "source": "https://github.com/pdfme/pdfme/blob/main/LICENSE.md"
+  },
+  "@pdfme/pdf-lib@6.2.8": {
+    "license": "MIT",
+    "path": "notices/pdfme-pdf-lib.txt",
+    "sha256": "f2c9fc00fdb66eb99ac156ba52d734af66d8d309f65753ae809ad34ee2883bcb",
+    "source": "https://github.com/pdfme/pdfme/blob/main/packages/pdf-lib/LICENSE.md"
+  },
+  "@pdfme/schemas@6.2.8": {
+    "license": "MIT",
+    "path": "notices/pdfme-6.2.8.txt",
+    "sha256": "d43121abfdaebee1e0d24ce91805811627df2cd27419cc86a13fae6a4e5d9069",
+    "source": "https://github.com/pdfme/pdfme/blob/main/LICENSE.md"
+  },
+  "dfa@1.2.0": {
+    "license": "MIT",
+    "path": "notices/dfa-1.2.0.txt",
+    "sha256": "67c5522204e2270b7bf72601916c4898cfe1a7570cc6ae2762ac32f7012509dd",
+    "source": "https://github.com/devongovett/dfa"
+  },
+  "brotli@1.3.3": {
+    "license": "MIT",
+    "path": "notices/brotli-1.3.3.txt",
+    "sha256": "649c8031549827a0143db4308e235e1a230f948e4607e8b6222a8edd5a2f7973",
+    "source": "https://github.com/devongovett/brotli.js"
+  },
+  "fontkit@2.0.4": {
+    "license": "MIT",
+    "path": "notices/fontkit-2.0.4.txt",
+    "sha256": "f3733c1d11c207178693bc6928650d106e6e40fbe52eab23b6866e7d9ef97005",
+    "source": "https://github.com/foliojs/fontkit"
+  },
+  "air-datepicker@3.6.0": {
+    "license": "MIT",
+    "path": "notices/air-datepicker-3.6.0.txt",
+    "sha256": "d72134cb316c794deb47c348646ed47dd2d0b99d9eea808d809d7d0530fd8587",
+    "source": "https://github.com/t1m0n/air-datepicker"
+  },
+  "@excalidraw/excalidraw@0.18.1": {
+    "license": "MIT",
+    "path": "notices/excalidraw-0.18.1.txt",
+    "sha256": "1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be",
+    "source": "https://github.com/excalidraw/excalidraw/blob/v0.18.1/LICENSE"
+  },
+  "@radix-ui/react-use-size@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-id@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-presence@1.1.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-compose-refs@1.1.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-focus-guards@1.1.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-focus-scope@1.1.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/primitive@1.1.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-callback-ref@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-portal@1.1.4": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-popper@1.2.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-escape-keydown@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-slot@1.1.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-popover@1.1.6": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/rect@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-dismissable-layer@1.1.5": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-primitive@2.0.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-context@1.1.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-layout-effect@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-controllable-state@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-rect@1.1.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-arrow@1.1.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "react-remove-scroll-bar@2.3.8": {
+    "license": "MIT",
+    "path": "notices/react-remove-scroll-bar-2.3.8.txt",
+    "sha256": "a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84",
+    "source": "https://github.com/theKashey/react-remove-scroll-bar"
+  },
+  "fastdom@1.0.12": {
+    "license": "MIT",
+    "path": "notices/fastdom-1.0.12.txt",
+    "sha256": "e39700c90429907de1606c164d0d86843c18c0b9a5d460d090cb423df5dd9875",
+    "source": "https://github.com/wilsonpage/fastdom"
+  },
+  "strictdom@1.0.1": {
+    "license": "MIT",
+    "path": "notices/strictdom-1.0.1.txt",
+    "sha256": "148951cfb6e1a9d9ed204f11c91ca704967b195f2c9ec5087cb3e63b5ebd52a4",
+    "source": "https://github.com/wilsonpage/strictdom"
+  },
+  "@radix-ui/primitive@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-tabs@1.0.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-id@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-presence@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-direction@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-roving-focus@1.0.2": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-primitive@1.0.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-context@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-controllable-state@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-layout-effect@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-compose-refs@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-use-callback-ref@1.0.0": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-collection@1.0.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "@radix-ui/react-slot@1.0.1": {
+    "license": "MIT",
+    "path": "notices/radix-primitives.txt",
+    "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+    "source": "https://github.com/radix-ui/primitives/blob/main/LICENSE"
+  },
+  "onnxruntime-web@1.31.0-dev.20260914-8d85527a0": {
+    "license": "MIT",
+    "path": "notices/onnxruntime.txt",
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "source": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE"
+  },
+  "onnxruntime-common@1.30.0": {
+    "license": "MIT",
+    "path": "notices/onnxruntime.txt",
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "source": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE"
   }
 }

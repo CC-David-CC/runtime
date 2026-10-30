@@ -8,9 +8,9 @@ import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const defaults=path.resolve(here,'../..');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const ids=['calculator','files','help','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','wavesurfer','tone','audio-editor','zip','gcode-preview','grid-tools','personal-template'];
+const ids=['calculator','files','help','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','wavesurfer','tone','audio-editor','zip','gcode-preview','grid-tools','mermaid','echarts','plotly','pdfme','maplibre','transformers','replicad','diagrams-net','excalidraw','svg-editor','personal-template'];
 const safeFile=/^(?:[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*\/)*[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*$/;
-const publicExtensions=new Set(['.mjs','.js','.css','.html','.json','.txt','.stl','.wasm','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.ogg','.wav','.mp3']);
+const publicExtensions=new Set(['.mjs','.js','.css','.html','.json','.xml','.txt','.stl','.wasm','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.ogg','.wav','.mp3']);
 const options=JSON.parse(await readFile(process.argv[2],'utf8'));
 const source=path.resolve(options.source??path.join(defaults,'../apps'));
 const output=path.resolve(options.output??path.join(defaults,'assets/desktop'));
@@ -53,7 +53,7 @@ for(const id of selected){
   if(!Array.isArray(manifest.patches??[])||(manifest.patches??[]).length>8)throw Error('Invalid dependency patch list');
   for(const patch of manifest.patches??[]){
     if(!patch||Object.keys(patch).sort().join(',')!=='find,path,replace,sha256'||typeof patch.path!=='string'||!safeFile.test(patch.path)||!patch.path.startsWith('node_modules/')||!/^([a-f0-9]{64})$/.test(patch.sha256)||typeof patch.find!=='string'||!patch.find||patch.find.length>4096||typeof patch.replace!=='string'||patch.replace.length>4096)throw Error('Invalid dependency patch');
-    const file=await regular(path.resolve(appRoot,patch.path),[dependencyRoots[0]]);if(patches.has(file))throw Error('Duplicate dependency patch');patches.set(file,patch);
+    const file=await regular(path.resolve(appRoot,patch.path),[dependencyRoots[0]]);const group=patches.get(file)??[];if(group.some(item=>item.sha256!==patch.sha256))throw Error('Conflicting dependency patch hashes');group.push(patch);patches.set(file,group);
   }
   const entries={index:entry};
   for(const [name,file] of Object.entries(manifest.workers??{})){
@@ -78,10 +78,10 @@ for(const id of selected){
           const marker='__CODI_ASSET_'+digest+'__';importedAssets.set(marker,{name,bytes});
           return {contents:'export default new URL('+JSON.stringify(marker)+',import.meta.url).href;',loader:'js'};
         });
-        api.onLoad({filter:/.*/,namespace:'file'},async args=>{await regular(args.path,[source,...dependencyRoots],true);const patch=patches.get(args.path);if(!patch)return undefined;const raw=await readFile(args.path);if(hash(raw)!==patch.sha256)throw Error('Dependency patch hash mismatch: '+patch.path);const contents=raw.toString('utf8');if(contents.split(patch.find).length!==2)throw Error('Dependency patch must match exactly once: '+patch.path);return {contents:contents.replace(patch.find,patch.replace),loader:'js',resolveDir:path.dirname(args.path)};});
+        api.onLoad({filter:/.*/,namespace:'file'},async args=>{await regular(args.path,[source,...dependencyRoots],true);const group=patches.get(args.path);if(!group)return undefined;const raw=await readFile(args.path);if(hash(raw)!==group[0].sha256)throw Error('Dependency patch hash mismatch: '+group[0].path);let contents=raw.toString('utf8');for(const patch of group){if(contents.split(patch.find).length!==2)throw Error('Dependency patch must match exactly once: '+patch.path);contents=contents.replace(patch.find,patch.replace);}return {contents,loader:'js',resolveDir:path.dirname(args.path)};});
       }}]});
     for(const [file,metadata] of Object.entries(result.metafile.outputs)){
-      if(metadata.imports.some(item=>item.external&&!(item.kind==='url-token'&&/^data:image\/(?:png;base64|svg\+xml(?:;base64)?),/i.test(item.path)&&item.path.length<16384)))throw Error('Unbundled external import in '+file+': '+JSON.stringify(metadata.imports.filter(item=>item.external).map(item=>({kind:item.kind,path:item.path.slice(0,120)}))));
+      if(metadata.imports.some(item=>item.external&&!(item.kind==='url-token'&&/^data:image\/(?:png;base64|svg\+xml(?:;charset=utf-8)?(?:;base64)?),/i.test(item.path)&&item.path.length<16384)))throw Error('Unbundled external import in '+file+': '+JSON.stringify(metadata.imports.filter(item=>item.external).map(item=>({kind:item.kind,path:item.path.slice(0,120)}))));
     }
     const files=new Map();
     const put=(name,bytes)=>{
@@ -103,7 +103,7 @@ for(const id of selected){
       put(name,bytes);
     }
     for(const marker of usedAssets){const {name,bytes}=importedAssets.get(marker);if(!files.has(name))put(name,bytes);}
-    if(!Array.isArray(manifest.assets??[])||(manifest.assets??[]).length>128)throw Error('Invalid explicit asset list');
+    if(!Array.isArray(manifest.assets??[])||(manifest.assets??[]).length>4096)throw Error('Invalid explicit asset list');
     for(const name of manifest.assets??[]){
       if(typeof name!=='string'||!safeFile.test(name))throw Error('Invalid explicit asset');
       put(name,await readFile(await regular(path.resolve(appRoot,name),[appRoot])));
@@ -119,7 +119,7 @@ for(const id of selected){
       }
     }
     for(const [dir,pkg] of packages){
-      const notices=(await readdir(dir)).filter(name=>/^(licen[cs]e|copying|notice)(\..*)?$/i.test(name));
+      const notices=(await readdir(dir)).filter(name=>/^(licen[cs]e|copying|notice)([.-].*)?$/i.test(name));
       const label=pkg.name.replaceAll('/','-')+'-'+pkg.version;
       if(!notices.length){
         // Some npm tarballs omit their upstream LICENSE. Only a reviewed,
@@ -136,7 +136,7 @@ for(const id of selected){
       for(const name of notices)put('licenses/'+label+'/'+name+'.txt',await readFile(await regular(path.join(dir,name),dependencyRoots)));
     }
     const descriptions=Object.fromEntries([...files].sort(([a],[b])=>a.localeCompare(b,'en')).map(([name,bytes])=>[name,{sha256:hash(bytes),bytes:bytes.length}]));
-    if(files.size>256||[...files.values()].reduce((sum,b)=>sum+b.length,0)>96*1024*1024)throw Error('App bundle exceeds file/size limits');
+    if(files.size>4096||[...files.values()].reduce((sum,b)=>sum+b.length,0)>96*1024*1024)throw Error('App bundle exceeds file/size limits: '+files.size+' files, '+[...files.values()].reduce((sum,b)=>sum+b.length,0)+' bytes');
     if(!files.has('index.mjs'))throw Error('Missing bundled app entrypoint');
     const bundleSHA=hash(JSON.stringify(descriptions));
     const destination=path.join(output,'apps',id,bundleSHA);

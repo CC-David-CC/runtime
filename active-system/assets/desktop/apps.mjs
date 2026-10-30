@@ -9,11 +9,11 @@ async function catalog(){
     const response=await fetch(new URL('apps.json',import.meta.url),{cache:'no-cache',credentials:'same-origin',redirect:'error'});
     if(!response.ok)throw Error('App catalog unavailable');
     const text=await response.text();if(text.length>2097152)throw Error('App catalog too large');
-    const value=strictJson(text,{maxBytes:2097152,maxValues:32768});
+    const value=strictJson(text,{maxBytes:2097152,maxValues:65536});
     if(value.version!=='codi-public-apps/2'||value.hostAPI!==2||!Array.isArray(value.apps)||value.apps.length>32)throw Error('Invalid app catalog');
     const result=new Map();
     for(const app of value.apps){
-      if(!app||typeof app.id!=='string'||!/^[a-z][a-z0-9-]{0,31}$/.test(app.id)||result.has(app.id)||app.kind!=='browser'||!digest(app.sha256)||!digest(app.bundleSHA256)||app.path!=='assets/desktop/apps/'+app.id+'/'+app.bundleSHA256+'/index.mjs'||!app.files||Array.isArray(app.files)||Object.keys(app.files).length>256||!Array.isArray(app.styles))throw Error('Invalid app reference');
+      if(!app||typeof app.id!=='string'||!/^[a-z][a-z0-9-]{0,31}$/.test(app.id)||result.has(app.id)||app.kind!=='browser'||!digest(app.sha256)||!digest(app.bundleSHA256)||app.path!=='assets/desktop/apps/'+app.id+'/'+app.bundleSHA256+'/index.mjs'||!app.files||Array.isArray(app.files)||Object.keys(app.files).length>4096||!Array.isArray(app.styles))throw Error('Invalid app reference');
       for(const [name,file] of Object.entries(app.files))if(!safeFile(name)||!file||!digest(file.sha256)||!Number.isSafeInteger(file.bytes)||file.bytes<0||file.bytes>67108864)throw Error('Invalid app file');
       if(Object.values(app.files).reduce((total,file)=>total+file.bytes,0)>100663296)throw Error('App bundle too large');
       if(app.files['index.mjs']?.sha256!==app.sha256||app.files['index.mjs']?.bytes!==app.bytes||app.styles.length>16||new Set(app.styles).size!==app.styles.length||app.styles.some(name=>!safeFile(name)||!name.endsWith('.css')||!app.files[name]))throw Error('Invalid app entry/styles');
