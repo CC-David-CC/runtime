@@ -8,9 +8,9 @@ import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const defaults=path.resolve(here,'../..');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const ids=['calculator','files','help','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','wavesurfer','tone','audio-editor','zip','gcode-preview','grid-tools','mermaid','echarts','plotly','pdfme','maplibre','transformers','replicad','diagrams-net','notebook','excalidraw','svg-editor','personal-template'];
+const ids=['calculator','files','help','browser','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','wavesurfer','tone','audio-editor','zip','gcode-preview','grid-tools','mermaid','echarts','plotly','pdfme','maplibre','transformers','replicad','diagrams-net','notebook','excalidraw','svg-editor','personal-template'];
 const safeFile=/^(?:[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*\/)*[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*$/;
-const publicExtensions=new Set(['.mjs','.js','.css','.html','.json','.xml','.txt','.stl','.wasm','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.eot','.zip','.whl','.ipynb','.webmanifest','.ogg','.wav','.mp3']);
+const publicExtensions=new Set(['.mjs','.js','.css','.html','.json','.xml','.txt','.stl','.wasm','.data','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.eot','.zip','.whl','.ipynb','.webmanifest','.ogg','.wav','.mp3']);
 const options=JSON.parse(await readFile(process.argv[2],'utf8'));
 const source=path.resolve(options.source??path.join(defaults,'../apps'));
 const output=path.resolve(options.output??path.join(defaults,'assets/desktop'));
@@ -136,7 +136,7 @@ for(const id of selected){
       for(const name of notices)put('licenses/'+label+'/'+name+'.txt',await readFile(await regular(path.join(dir,name),dependencyRoots)));
     }
     const descriptions=Object.fromEntries([...files].sort(([a],[b])=>a.localeCompare(b,'en')).map(([name,bytes])=>[name,{sha256:hash(bytes),bytes:bytes.length}]));
-    if(files.size>4096||[...files.values()].reduce((sum,b)=>sum+b.length,0)>96*1024*1024)throw Error('App bundle exceeds file/size limits: '+files.size+' files, '+[...files.values()].reduce((sum,b)=>sum+b.length,0)+' bytes');
+    if(files.size>4096||[...files.values()].some(b=>b.length>256*1024*1024)||[...files.values()].reduce((sum,b)=>sum+b.length,0)>320*1024*1024)throw Error('App bundle exceeds file/size limits: '+files.size+' files, '+[...files.values()].reduce((sum,b)=>sum+b.length,0)+' bytes');
     if(!files.has('index.mjs'))throw Error('Missing bundled app entrypoint');
     const bundleSHA=hash(JSON.stringify(descriptions));
     const destination=path.join(output,'apps',id,bundleSHA);

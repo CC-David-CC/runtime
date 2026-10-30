@@ -14,8 +14,8 @@ async function catalog(){
     const result=new Map();
     for(const app of value.apps){
       if(!app||typeof app.id!=='string'||!/^[a-z][a-z0-9-]{0,31}$/.test(app.id)||result.has(app.id)||app.kind!=='browser'||!digest(app.sha256)||!digest(app.bundleSHA256)||app.path!=='assets/desktop/apps/'+app.id+'/'+app.bundleSHA256+'/index.mjs'||!app.files||Array.isArray(app.files)||Object.keys(app.files).length>4096||!Array.isArray(app.styles))throw Error('Invalid app reference');
-      for(const [name,file] of Object.entries(app.files))if(!safeFile(name)||!file||!digest(file.sha256)||!Number.isSafeInteger(file.bytes)||file.bytes<0||file.bytes>67108864)throw Error('Invalid app file');
-      if(Object.values(app.files).reduce((total,file)=>total+file.bytes,0)>100663296)throw Error('App bundle too large');
+      for(const [name,file] of Object.entries(app.files))if(!safeFile(name)||!file||!digest(file.sha256)||!Number.isSafeInteger(file.bytes)||file.bytes<0||file.bytes>268435456)throw Error('Invalid app file');
+      if(Object.values(app.files).reduce((total,file)=>total+file.bytes,0)>335544320)throw Error('App bundle too large');
       if(app.files['index.mjs']?.sha256!==app.sha256||app.files['index.mjs']?.bytes!==app.bytes||app.styles.length>16||new Set(app.styles).size!==app.styles.length||app.styles.some(name=>!safeFile(name)||!name.endsWith('.css')||!app.files[name]))throw Error('Invalid app entry/styles');
       result.set(app.id,app);
     }
