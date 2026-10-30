@@ -5,9 +5,13 @@
   "type": "module",
   "description": "Build-time dependencies for trusted public desktop applications",
   "devDependencies": {
+    "@samuelncui/chonky": "0.3.10",
+    "@samuelncui/chonky-icon-fontawesome": "0.3.10",
     "@xterm/addon-fit": "0.11.0",
     "@xterm/addon-serialize": "0.14.0",
     "@xterm/xterm": "6.0.0",
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   }
 }

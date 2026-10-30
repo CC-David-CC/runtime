@@ -4,5 +4,17 @@
     "sha256": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd",
     "source": "https://raw.githubusercontent.com/xtermjs/xterm.js/f447274f430fd22513f6adbf9862d19524471c04/LICENSE",
     "license": "MIT"
+  },
+  "@react-dnd/invariant@4.0.2": {
+    "path": "notices/react-dnd-license.txt",
+    "sha256": "10c8da64ecfa3067cf9231e0ba19b8d7730e7fed3ac5eaa37ccb97c3c5e71336",
+    "source": "https://raw.githubusercontent.com/react-dnd/react-dnd/641fd36c130e42c3cf08987924151efa1452bca7/LICENSE",
+    "license": "MIT"
+  },
+  "@react-dnd/shallowequal@4.0.2": {
+    "path": "notices/react-dnd-license.txt",
+    "sha256": "10c8da64ecfa3067cf9231e0ba19b8d7730e7fed3ac5eaa37ccb97c3c5e71336",
+    "source": "https://raw.githubusercontent.com/react-dnd/react-dnd/641fd36c130e42c3cf08987924151efa1452bca7/LICENSE",
+    "license": "MIT"
   }
 }

@@ -76,8 +76,9 @@ for(const id of selected){
     }
     const files=new Map();
     const put=(name,bytes)=>{
-      if(!safeFile.test(name)||!publicExtensions.has(path.extname(name).toLowerCase())||files.has(name))throw Error('Invalid or conflicting public output: '+name);
-      files.set(name,Buffer.from(bytes));
+      if(!safeFile.test(name)||!publicExtensions.has(path.extname(name).toLowerCase()))throw Error('Invalid public output: '+name);
+      const value=Buffer.from(bytes);if(files.has(name)){if(!files.get(name).equals(value))throw Error('Conflicting public output: '+name);return;}
+      files.set(name,value);
     };
     const usedAssets=new Set();
     for(const file of result.outputFiles){
