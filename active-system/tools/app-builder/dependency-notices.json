@@ -335,5 +335,65 @@
     "path": "notices/onnxruntime.txt",
     "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
     "source": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE"
+  },
+  "onnxruntime-web@1.31.1": {
+    "license": "MIT",
+    "path": "notices/onnxruntime.txt",
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "source": "https://github.com/microsoft/onnxruntime/blob/v1.31.1/LICENSE"
+  },
+  "uint8-util@2.3.2": {
+    "license": "MIT",
+    "path": "notices/uint8-util-2.3.2.txt",
+    "sha256": "fc85ce727346dca1a3bdd6442fe911dc4f2f23fb6c13e06b099979a83683cc68",
+    "source": "https://github.com/ThaUnknown/uint8-util/blob/4e704b9c22923724c774c1fb5d5a90c013821574/package.json"
+  },
+  "throughput@1.0.2": {
+    "license": "MIT",
+    "path": "notices/throughput-1.0.2.txt",
+    "sha256": "9bf0142e3593de42a25b8d6ac41e5cb23251a9512f006950fdefa75efc62d4b0",
+    "source": "https://github.com/ThaUnknown/throughput/blob/f03e2e8b87853c86273ed2100546d24b6b3e046a/package.json"
+  },
+  "block-iterator@1.1.2": {
+    "license": "MIT",
+    "path": "notices/block-iterator-1.1.2.txt",
+    "sha256": "13b393504b87375fd2df6f325d1a509a211a66dfc5504bfb50cda9b38c20196b",
+    "source": "https://github.com/ThaUnknown/block-iterator/blob/f2de6fbaab737479b38c93ba9ec65c942ddb9172/package.json"
+  },
+  "piece-length@2.0.1": {
+    "license": "MIT",
+    "path": "notices/piece-length-2.0.1.txt",
+    "sha256": "7a46fc214f64a935ba6d59d72518c8522fa1066378a988202514256d29ea6b26",
+    "source": "https://github.com/michaelrhodes/piece-length/blob/2c7b5bd5df59a5c2b5a2d5dde332b483226751f1/package.json"
+  },
+  "fast-readable-async-iterator@2.0.0": {
+    "license": "MIT",
+    "path": "notices/fast-readable-async-iterator-2.0.0.txt",
+    "sha256": "6d8af2f9ca8c9974a5d9718cd494bb0338cffd206dfdc497797808d12767b08a",
+    "source": "https://github.com/ThaUnknown/fast-readable-async-iterator/blob/6ff7679cbbe1d67753bb3a70eca5784498982604/package.json"
+  },
+  "cross-fetch-ponyfill@1.0.3": {
+    "license": "MIT",
+    "path": "notices/cross-fetch-ponyfill-1.0.3.txt",
+    "sha256": "c0925da989caa664f00e094be3930ec5d3c46d4145a221c2eb14bcbae6348757",
+    "source": "https://github.com/ThaUnknown/cross-fetch-ponyfill/blob/aae756c4e5ba5edf660293ade1c8c15f88f5291e/package.json"
+  },
+  "webrtc-polyfill@1.2.2": {
+    "license": "MIT",
+    "path": "notices/webrtc-polyfill-1.2.2.txt",
+    "sha256": "2a6613210d9c61538ab63a50ac9d5e5644a038945b3ca16411093ba18285b625",
+    "source": "https://github.com/ThaUnknown/webrtc-polyfill/blob/f41ae37ee72de89dc9f4011f479ece7f1cef1ddf/package.json"
+  },
+  "err-code@3.0.1": {
+    "license": "MIT",
+    "path": "notices/err-code-3.0.1.txt",
+    "sha256": "1dc3fba8d137dc0d539844da3aa431b77c2092a494c3a6f8147ebb8e2e3be920",
+    "source": "https://registry.npmjs.org/err-code/3.0.1"
+  },
+  "chunk-store-iterator@1.0.4": {
+    "license": "MIT",
+    "path": "notices/chunk-store-iterator-1.0.4.txt",
+    "sha256": "f8c0f7e95c011d744ae638fff62b9b78360da15b02493c25051f41798495c2df",
+    "source": "https://github.com/ThaUnknown/chunk-store-iterator/blob/07f2fd94c48be31de371bc50e69ea1cdb3cac514/package.json"
   }
 }
