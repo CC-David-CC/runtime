@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const defaults=path.resolve(here,'../..');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const ids=['calculator','files','help','browser','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','wavesurfer','tone','audio-editor','zip','gcode-preview','grid-tools','mermaid','echarts','plotly','pdfme','maplibre','transformers','replicad','diagrams-net','notebook','excalidraw','svg-editor','arduino-simulator','pico-simulator','circuitjs','digital-logic','embroidery-studio','stitch-converter','personal-template'];
+const ids=['calculator','files','help','browser','terminal','text','image-editor','document-editor','pdf-viewer','spreadsheet','data-explorer','ffmpeg','wavesurfer','tone','audio-editor','zip','gcode-preview','grid-tools','mermaid','echarts','plotly','pdfme','maplibre','transformers','replicad','diagrams-net','notebook','excalidraw','svg-editor','arduino-simulator','pico-simulator','circuitjs','electronics-design','digital-logic','embroidery-studio','stitch-converter','personal-template'];
 const safeFile=/^(?:[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*\/)*[a-zA-Z0-9_@+-][a-zA-Z0-9_@+.-]*$/;
 const publicExtensions=new Set(['.mjs','.js','.css','.html','.json','.xml','.txt','.hex','.c','.ino','.stl','.wasm','.data','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.eot','.zip','.whl','.ipynb','.webmanifest','.ogg','.wav','.mp3']);
 const options=JSON.parse(await readFile(process.argv[2],'utf8'));
