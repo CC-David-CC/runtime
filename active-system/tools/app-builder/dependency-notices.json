@@ -395,5 +395,11 @@
     "path": "notices/chunk-store-iterator-1.0.4.txt",
     "sha256": "f8c0f7e95c011d744ae638fff62b9b78360da15b02493c25051f41798495c2df",
     "source": "https://github.com/ThaUnknown/chunk-store-iterator/blob/07f2fd94c48be31de371bc50e69ea1cdb3cac514/package.json"
+  },
+  "@rive-app/canvas@2.49.0": {
+    "license": "MIT",
+    "path": "notices/rive-canvas-2.49.0.txt",
+    "sha256": "8a1efa755d19446b51a18e1c15f6308728da0b36283c4d38050698ad6954b69a",
+    "source": "https://github.com/rive-app/rive-wasm/blob/598627c7f493cab5e1d297c79a278419ee67cb84/LICENSE"
   }
 }
