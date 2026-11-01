@@ -10,7 +10,7 @@ async function catalog(){
     if(!response.ok)throw Error('App catalog unavailable');
     const text=await response.text();if(text.length>2097152)throw Error('App catalog too large');
     const value=strictJson(text,{maxBytes:2097152,maxValues:65536});
-    if(value.version!=='codi-public-apps/2'||value.hostAPI!==2||!Array.isArray(value.apps)||value.apps.length>64)throw Error('Invalid app catalog');
+    if(value.version!=='codi-public-apps/2'||value.hostAPI!==2||!Array.isArray(value.apps)||value.apps.length>128)throw Error('Invalid app catalog');
     const result=new Map();
     for(const app of value.apps){
       if(!app||typeof app.id!=='string'||!/^[a-z][a-z0-9-]{0,31}$/.test(app.id)||result.has(app.id)||app.kind!=='browser'||!digest(app.sha256)||!digest(app.bundleSHA256)||app.path!=='assets/desktop/apps/'+app.id+'/'+app.bundleSHA256+'/index.mjs'||!app.files||Array.isArray(app.files)||Object.keys(app.files).length>4096||!Array.isArray(app.styles))throw Error('Invalid app reference');
