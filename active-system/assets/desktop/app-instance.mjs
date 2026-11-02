@@ -23,6 +23,8 @@ export function mountApp(module,host){
     if(tools?.loadTone){const load=tools.loadTone;tools.loadTone=async (...args)=>{if(disposed)throw Error('App view closed.');const tone=await load(...args);if(disposed)throw Error('App view closed.');return tone;};}
     view=module.mount({...host,tools,version:2,signal:controller.signal,onDispose});
     if(!view||!(view.element instanceof HTMLElement)||!view.element.classList.contains('window-content')||typeof view.dispose!=='function'||typeof view.then==='function')throw Error('App API 2 requires { element, dispose() }');
-    return {element:view.element,signal:controller.signal,dispose};
+    // Optional additive API: legacy apps continue to mount unchanged. The
+    // session host validates lifecycle before relying on it.
+    return {element:view.element,signal:controller.signal,dispose,lifecycle:view.lifecycle};
   }catch(error){dispose('Mount failed');throw error;}
 }
