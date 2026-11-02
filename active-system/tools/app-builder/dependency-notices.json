@@ -401,5 +401,17 @@
     "path": "notices/rive-canvas-2.49.0.txt",
     "sha256": "8a1efa755d19446b51a18e1c15f6308728da0b36283c4d38050698ad6954b69a",
     "source": "https://github.com/rive-app/rive-wasm/blob/598627c7f493cab5e1d297c79a278419ee67cb84/LICENSE"
+  },
+  "saxes@6.0.0": {
+    "path": "notices/saxes-6.0.0.txt",
+    "sha256": "0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e",
+    "source": "https://raw.githubusercontent.com/lddubeau/saxes/v6.0.0/LICENSE",
+    "license": "ISC"
+  },
+  "@mujoco/mujoco@3.17.0": {
+    "path": "notices/mujoco-3.17.0.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "source": "https://raw.githubusercontent.com/google-deepmind/mujoco/800a109a4bdd02cb60404d565db4ae16fb04a53b/LICENSE",
+    "license": "Apache-2.0"
   }
 }
