@@ -49,6 +49,7 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
     signal?.removeEventListener('abort', dispose);
     unsubscribeCoordinator();
     notify();
+    listeners.clear();
   }
   const unsubscribeCoordinator = coordinator.subscribe(notify);
   signal?.addEventListener('abort', dispose, { once: true });

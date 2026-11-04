@@ -86,3 +86,10 @@ test('invalid input and already-aborted session fail closed', () => {
   assert.throws(()=>createDocumentOperations({coordinator,documentKey:{path:'x'}}),TypeError);
   const valid=createDocumentOperations({coordinator}); assert.throws(()=>valid.begin(''),TypeError); assert.throws(()=>valid.setDocument(''),TypeError);
 });
+
+test('dispose notifies controls disabled once and releases subscriptions', () => {
+  const {one} = setup(); let count=0;
+  const button={disabled:false}; one.bindControl(button); one.subscribe(()=>count++);
+  one.dispose(); assert.equal(button.disabled,true); assert.equal(count,1);
+  one.refresh(); assert.equal(count,1);
+});
