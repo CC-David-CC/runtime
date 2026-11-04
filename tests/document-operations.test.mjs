@@ -93,3 +93,86 @@ test('dispose notifies controls disabled once and releases subscriptions', () =>
   one.dispose(); assert.equal(button.disabled,true); assert.equal(count,1);
   one.refresh(); assert.equal(count,1);
 });
+
+test('folder claims exclude current and future descendants, with namespace and segment boundaries', () => {
+  const coordinator=createDocumentOperationCoordinator();
+  const files=createDocumentOperations({coordinator});
+  const child=createDocumentOperations({coordinator,documentKey:'mirror:/projects/plate.txt'});
+  const sibling=createDocumentOperations({coordinator,documentKey:'mirror:/projects-other/plate.txt'});
+  const guest=createDocumentOperations({coordinator,documentKey:'guest:/projects/plate.txt'});
+  const button={disabled:false}; child.bindControl(button);
+  const moving=files.begin('move'); assert.equal(moving.claimDocumentTree('mirror:/projects'),true);
+  assert.equal(button.disabled,true); assert.equal(child.begin('save'),null);
+  const newChild=createDocumentOperations({coordinator,documentKey:'mirror:/projects/sub/new.txt'});
+  assert.equal(newChild.begin('save'),null);
+  const a=sibling.begin('save'),b=guest.begin('save'); assert.ok(a); assert.ok(b);
+  moving.finish(); assert.equal(button.disabled,false);
+  const c=child.begin('save'); assert.ok(c); c.finish(); a.finish(); b.finish();
+});
+
+test('child saves prevent parent mutations and failed claims do not evict the owner', () => {
+  const coordinator=createDocumentOperationCoordinator();
+  const files=createDocumentOperations({coordinator}),child=createDocumentOperations({coordinator,documentKey:'mirror:/a/b.txt'});
+  const saving=child.begin('save'),removing=files.begin('delete');
+  assert.equal(removing.claimDocumentTree('mirror:/a'),false);
+  assert.equal(removing.claimDocumentTree('mirror:/'),false);
+  assert.equal(saving.current(),true);
+  saving.finish(); assert.equal(removing.claimDocumentTree('mirror:/a'),true);
+  assert.equal(child.begin('load'),null);
+  removing.finish(); assert.ok(child.begin('save')); child.dispose();
+});
+
+test('overlapping directories, same-owner upgrades and root scope', () => {
+  const coordinator=createDocumentOperationCoordinator();
+  const one=createDocumentOperations({coordinator}),two=createDocumentOperations({coordinator});
+  const a=one.begin('move'),b=two.begin('move');
+  assert.equal(a.claimDocument('mirror:/a'),true);
+  assert.equal(b.claimDocument('mirror:/a/child'),true);
+  assert.equal(a.claimDocumentTree('mirror:/a'),false);
+  b.finish(); assert.equal(a.claimDocumentTree('mirror:/a'),true);
+  assert.equal(a.claimDocument('mirror:/a'),true);
+  const c=two.begin('delete'); assert.equal(c.claimDocumentTree('mirror:/a/deep'),false);
+  assert.equal(c.claimDocumentTree('mirror:/'),false);
+  assert.equal(c.claimDocumentTree('mirror:/elsewhere'),true);
+  a.finish(); assert.equal(c.claimDocumentTree('mirror:/'),true);
+  assert.equal(c.claimDocumentTree('mirror:/a'),true);
+  const blocked=createDocumentOperations({coordinator,documentKey:'mirror:/new.txt'});
+  assert.equal(blocked.begin('save'),null); c.finish(); assert.ok(blocked.begin('save')); blocked.dispose();
+});
+
+test('abort releases source and destination trees without affecting later ownership', () => {
+  const coordinator=createDocumentOperationCoordinator(),abort=new AbortController();
+  const files=createDocumentOperations({coordinator,signal:abort.signal});
+  const old=files.begin('move'); old.claimDocumentTree('mirror:/source'); old.claimDocumentTree('mirror:/target');
+  const source=createDocumentOperations({coordinator,documentKey:'mirror:/source/a'});
+  const target=createDocumentOperations({coordinator,documentKey:'mirror:/target/a'});
+  assert.equal(source.busy,true); assert.equal(target.busy,true);
+  abort.abort(); assert.equal(old.current(),false); assert.equal(old.signal.aborted,true);
+  const a=source.begin('save'),b=target.begin('save'); assert.ok(a); assert.ok(b);
+  assert.equal(old.claimDocumentTree('mirror:/'),false); old.finish();
+  assert.equal(a.current(),true); assert.equal(b.current(),true); a.finish(); b.finish();
+});
+
+test('tree keys are canonical storage paths, not URLs or cross-account claims', () => {
+  const coordinator=createDocumentOperationCoordinator(),one=createDocumentOperations({coordinator});
+  const token=one.begin('delete');
+  for(const key of [null,'','/folder','mirror:relative','mirror:/a/','mirror://a','mirror:/a/../b','mirror:/./a','mirror:/a\0b']) {
+    assert.throws(()=>token.claimDocumentTree(key),TypeError);
+  }
+  assert.equal(token.claimDocumentTree('mirror:/%2Ffolder'),true);
+  const literal=createDocumentOperations({coordinator,documentKey:'mirror:/%2Ffolder/a'});
+  const different=createDocumentOperations({coordinator,documentKey:'mirror:/folder/a'});
+  assert.equal(literal.busy,true); assert.equal(different.busy,false);
+  const isolated=createDocumentOperations({coordinator:createDocumentOperationCoordinator(),documentKey:'mirror:/%2Ffolder/a'});
+  assert.ok(isolated.begin('save')); isolated.dispose(); token.finish();
+});
+
+test('listener disposal during tree publication releases the reservation', () => {
+  const coordinator=createDocumentOperationCoordinator(),one=createDocumentOperations({coordinator});
+  const child=createDocumentOperations({coordinator,documentKey:'mirror:/folder/file'});
+  child.subscribe(()=>{if(child.busy)one.dispose();});
+  const token=one.begin('delete'); assert.ok(token);
+  assert.equal(token.claimDocumentTree('mirror:/folder'),false);
+  assert.equal(child.busy,false); assert.equal(token.current(),false);
+  assert.ok(child.begin('save')); child.dispose();
+});

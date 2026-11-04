@@ -1,20 +1,54 @@
 // Keys are explicit, session-scoped document identities supplied by the host.
 // A coordinator contains active claims only; it never retains document data.
+function validateTreeKey(key) {
+  // These are canonical storage paths, not URLs: never decode or normalize a
+  // path here. Apps obtain the path from their storage service before claiming.
+  if (typeof key !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*:\//.test(key)) {
+    throw new TypeError('A document tree needs a namespace and canonical absolute path.');
+  }
+  const path = key.slice(key.indexOf(':/') + 1);
+  if (path.includes('\0') || (path !== '/' && path.slice(1).split('/').some(part => !part || part === '.' || part === '..'))) {
+    throw new TypeError('A document tree needs a canonical absolute path.');
+  }
+  return key;
+}
+
+function withinTree(tree, key) {
+  return key.startsWith(tree.endsWith('/') ? tree : tree + '/');
+}
+
+function overlaps(key, subtree, otherKey, otherSubtree) {
+  return key === otherKey || (subtree && withinTree(key, otherKey)) || (otherSubtree && withinTree(otherKey, key));
+}
+
 export function createDocumentOperationCoordinator() {
   const claims = new Map();
   const listeners = new Set();
   const notify = () => { for (const fn of [...listeners]) { try { fn(); } catch {} } };
+  function available(key, owner, subtree = false) {
+    if (key == null) return true;
+    for (const [otherKey, holder] of claims) {
+      if (holder.owner !== owner && overlaps(key, subtree, otherKey, holder.subtree)) return false;
+    }
+    return true;
+  }
+  function claim(key, owner, subtree = false) {
+    if (key == null) return true;
+    if (!available(key, owner, subtree)) return false;
+    const previous = claims.get(key);
+    if (!previous || (subtree && !previous.subtree)) {
+      claims.set(key, {owner, subtree});
+      notify();
+    }
+    return true;
+  }
   return Object.freeze({
-    available(key, owner) { return key == null || !claims.has(key) || claims.get(key) === owner; },
-    claim(key, owner) {
-      if (key == null) return true;
-      if (claims.has(key) && claims.get(key) !== owner) return false;
-      if (!claims.has(key)) { claims.set(key, owner); notify(); }
-      return true;
-    },
+    available,
+    claim,
+    claimTree(key, owner) { return claim(validateTreeKey(key), owner, true); },
     release(owner) {
       let changed = false;
-      for (const [key, holder] of claims) if (holder === owner) { claims.delete(key); changed = true; }
+      for (const [key, holder] of claims) if (holder.owner === owner) { claims.delete(key); changed = true; }
       if (changed) notify();
     },
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); }
@@ -74,6 +108,13 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
         validateKey(next);
         if (!isValid()) { dispose(); return false; }
         if (active !== record || !coordinator.claim(next, record)) return false;
+        if (!isValid()) { dispose(); return false; }
+        return active === record;
+      },
+      claimDocumentTree(next) {
+        validateTreeKey(next);
+        if (!isValid()) { dispose(); return false; }
+        if (active !== record || !coordinator.claimTree(next, record)) return false;
         if (!isValid()) { dispose(); return false; }
         return active === record;
       },
