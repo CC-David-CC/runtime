@@ -176,3 +176,22 @@ test('listener disposal during tree publication releases the reservation', () =>
   assert.equal(child.busy,false); assert.equal(token.current(),false);
   assert.ok(child.begin('save')); child.dispose();
 });
+
+test('selection availability is advisory, observable, and never reserves paths', () => {
+  const coordinator=createDocumentOperationCoordinator(),files=createDocumentOperations({coordinator});
+  const child=createDocumentOperations({coordinator,documentKey:'mirror:/folder/file'});
+  const rendered=[];files.subscribe(()=>rendered.push(files.canClaimDocumentTree('mirror:/folder')));
+  assert.equal(files.canClaimDocument('mirror:/folder/file'),true);
+  assert.equal(files.canClaimDocumentTree('mirror:/folder'),true);
+  const saving=child.begin('save');assert.ok(saving);
+  assert.equal(files.canClaimDocument('mirror:/folder/file'),false);
+  assert.equal(files.canClaimDocumentTree('mirror:/folder'),false);
+  assert.equal(files.canClaimDocumentTree('mirror:/folder-other'),true);
+  assert.equal(rendered.at(-1),false);
+  saving.finish();assert.equal(rendered.at(-1),true);
+  const own=files.begin('delete');assert.ok(own);
+  assert.equal(files.canClaimDocument('mirror:/unrelated'),false);
+  own.finish();files.dispose();
+  assert.equal(files.canClaimDocumentTree('mirror:/'),false);
+  assert.throws(()=>files.canClaimDocumentTree('mirror:/bad/../path'),TypeError);
+});

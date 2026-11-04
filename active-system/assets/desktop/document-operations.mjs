@@ -142,6 +142,15 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
     listeners.add(fn);
     return () => listeners.delete(fn);
   }
+  // Advisory only; actions must still begin and acquire claims synchronously.
+  function canClaimDocument(next) {
+    validateKey(next);
+    return !state().busy && coordinator.available(next, null);
+  }
+  function canClaimDocumentTree(next) {
+    validateTreeKey(next);
+    return !state().busy && coordinator.available(next, null, true);
+  }
   function bindControl(element, { disabled = () => false } = {}) {
     if (!element || typeof disabled !== 'function') throw new TypeError('A control and disabled predicate are required.');
     function update() {
@@ -155,5 +164,5 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
     update();
     return unsubscribe;
   }
-  return Object.freeze({ begin, setDocument, refresh, dispose, subscribe, bindControl, get state() { return state(); }, get busy() { return state().busy; } });
+  return Object.freeze({ begin, setDocument, canClaimDocument, canClaimDocumentTree, refresh, dispose, subscribe, bindControl, get state() { return state(); }, get busy() { return state().busy; } });
 }
