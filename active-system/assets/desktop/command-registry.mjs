@@ -19,7 +19,17 @@ export function createCommandRegistry({currentSubject,currentSession}) {
   if(typeof windowId!=='string'||typeof command!=='string')throw TypeError('A window and command are required.');
   const entry=entries.get(key(windowId,command));if(!entry||!accessible(entry))throw Error('Command is unavailable for this account or window.');
   let safeArgs;try{const text=JSON.stringify(args??{});if(text.length>8192)throw Error('too large');safeArgs=JSON.parse(text);}catch{throw TypeError('Command arguments must be small JSON values.');}
-  const session=currentSession();if(!session)throw Error('Command requires an active session.');const result=await entry.handler(safeArgs);if(currentSession()!==session||entries.get(key(windowId,command))!==entry||!accessible(entry))throw Error('The account or window changed while the command was running.');return result;
+  const session=currentSession();if(!session)throw Error('Command requires an active session.');
+  const result=await entry.handler(safeArgs);
+  if(currentSession()!==session||entries.get(key(windowId,command))!==entry||!accessible(entry)){
+   const error=Error('The account or window changed while the command was running.');
+   // Preserve an explicit publication outcome without returning a stale
+   // model/file payload across an account or window lifetime boundary.
+   const marker=result!==null&&typeof result==='object'?Object.getOwnPropertyDescriptor(result,'committed'):null;
+   if(marker&&Object.hasOwn(marker,'value')&&marker.value===true)Object.defineProperty(error,'committed',{value:true,enumerable:true});
+   throw error;
+  }
+  return result;
  }
  return Object.freeze({scope,list,execute});
 }
