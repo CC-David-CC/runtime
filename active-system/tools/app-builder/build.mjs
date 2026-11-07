@@ -1,5 +1,6 @@
 /** Bundle trusted first-party apps. Never copy a source directory wholesale. */
 import {build} from 'esbuild';
+import {assertAppInventory} from './inventory-limits.mjs';
 import {readFile, writeFile, mkdir, lstat, realpath, readdir, rename, rm, mkdtemp} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
@@ -136,7 +137,7 @@ for(const id of selected){
       for(const name of notices)put('licenses/'+label+'/'+name+'.txt',await readFile(await regular(path.join(dir,name),dependencyRoots)));
     }
     const descriptions=Object.fromEntries([...files].sort(([a],[b])=>a.localeCompare(b,'en')).map(([name,bytes])=>[name,{sha256:hash(bytes),bytes:bytes.length}]));
-    if(files.size>4096||[...files.values()].some(b=>b.length>256*1024*1024)||[...files.values()].reduce((sum,b)=>sum+b.length,0)>320*1024*1024)throw Error('App bundle exceeds file/size limits: '+files.size+' files, '+[...files.values()].reduce((sum,b)=>sum+b.length,0)+' bytes');
+    assertAppInventory([...files.values()].map(bytes=>bytes.length));
     if(!files.has('index.mjs'))throw Error('Missing bundled app entrypoint');
     const bundleSHA=hash(JSON.stringify(descriptions));
     const destination=path.join(output,'apps',id,bundleSHA);
