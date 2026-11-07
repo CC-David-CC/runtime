@@ -195,3 +195,43 @@ test('selection availability is advisory, observable, and never reserves paths',
   assert.equal(files.canClaimDocumentTree('mirror:/'),false);
   assert.throws(()=>files.canClaimDocumentTree('mirror:/bad/../path'),TypeError);
 });
+
+test('local-write phase belongs to its owner, not a peer busy state', () => {
+  const {one,two,other}=setup();
+  const saving=one.begin('save');
+  assert.equal(one.state.phase,'prepare');
+  assert.equal(two.busy,true); assert.equal(two.state.kind,null); assert.equal(two.state.phase,null);
+  assert.equal(saving.enterLocalWrite(),true); assert.equal(one.state.phase,'local-write');
+  assert.equal(saving.enterLocalWrite(),true); assert.equal(two.state.phase,null);
+  assert.equal(other.state.phase,null);
+  saving.finish(); assert.equal(one.state.phase,null); assert.equal(two.busy,false);
+});
+
+test('local write remains protected through receipt delivery and baseline publication', async () => {
+  const {one}=setup(); const op=one.begin('save');
+  assert.equal(op.enterLocalWrite(),true);
+  let deliver; const receipt=new Promise(resolve=>{deliver=resolve;});
+  const save=(async()=>{try{await receipt;assert.equal(one.state.phase,'local-write');}finally{op.finish();}})();
+  await Promise.resolve(); assert.equal(one.state.phase,'local-write');
+  deliver({version:'saved'}); await save; assert.equal(one.state.phase,null);
+  const reading=one.begin('load'); assert.equal(one.state.phase,'prepare'); reading.finish();
+});
+
+test('write-phase notification cannot authorize a disposed or replaced owner', () => {
+  const {one,two}=setup(); const op=one.begin('save');
+  one.subscribe(state=>{if(state.phase==='local-write')one.dispose();});
+  assert.equal(op.enterLocalWrite(),false); assert.equal(op.signal.aborted,true); assert.equal(two.busy,false);
+  const replacement=two.begin('save'); assert.ok(replacement);
+  assert.equal(op.enterLocalWrite(),false); op.finish(); assert.equal(replacement.current(),true);
+  replacement.finish();
+});
+
+test('write-phase refusal/error releases only the matching operation for retry', () => {
+  const {one}=setup(); const first=one.begin('save');
+  try{assert.equal(first.enterLocalWrite(),true);throw Error('controlled local write refusal');}
+  catch(error){assert.match(error.message,/controlled local write refusal/);}
+  finally{first.finish();}
+  const retry=one.begin('save'); assert.equal(retry.enterLocalWrite(),true);
+  first.finish(); assert.equal(one.state.phase,'local-write'); assert.equal(retry.current(),true);
+  retry.finish(); assert.equal(one.busy,false);
+});

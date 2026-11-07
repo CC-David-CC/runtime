@@ -66,7 +66,7 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
   function isValid() { try { return !disposed && !signal?.aborted && valid() === true; } catch { return false; } }
   function state() {
     const usable = isValid();
-    return Object.freeze({ busy: !!active || !usable || !coordinator.available(key, active), kind: active?.kind ?? null, disposed: !usable });
+    return Object.freeze({ busy: !!active || !usable || !coordinator.available(key, active), kind: active?.kind ?? null, phase: active?.phase ?? null, disposed: !usable });
   }
   function notify() { for (const fn of [...listeners]) { try { fn(state()); } catch {} } }
   function finish(record, abort) {
@@ -93,7 +93,7 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
     if (typeof kind !== 'string' || !kind) throw new TypeError('Operation kind is required.');
     if (!isValid()) { dispose(); return null; }
     if (active) return null;
-    const record = { kind, controller: new AbortController() };
+    const record = { kind, phase: 'prepare', controller: new AbortController() };
     // Set first: notification during claim may reenter this controller.
     active = record;
     if (!coordinator.claim(key, record)) { active = null; notify(); return null; }
@@ -104,6 +104,17 @@ export function createDocumentOperations({ signal, valid = () => true, coordinat
     return Object.freeze({
       signal: record.controller.signal,
       current() { if (!isValid()) { dispose(); return false; } return active === record; },
+      // Enter immediately before the local mutation. Keep the owned phase until
+      // finish(), including receipt delivery and accepted baseline publication.
+      // Peer contention and background server synchronization are not this phase.
+      enterLocalWrite() {
+        if (!isValid()) { dispose(); return false; }
+        if (active !== record) return false;
+        if (record.phase !== 'local-write') { record.phase = 'local-write'; notify(); }
+        // Notifications may dispose/replace ownership before the caller writes.
+        if (!isValid()) { dispose(); return false; }
+        return active === record;
+      },
       claimDocument(next) {
         validateKey(next);
         if (!isValid()) { dispose(); return false; }
