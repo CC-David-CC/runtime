@@ -1,0 +1,7 @@
+{
+  "confirmationType": "codi-gateway-identity+jwt",
+  "useType": "codi-gateway-use+jws",
+  "authorizePath": "/api/v1/gateway/authorize",
+  "challengePath": "/api/v1/gateway/challenge",
+  "grantLifetimeSeconds": 30
+}

@@ -8,6 +8,7 @@
     "./commands": "./active-system/assets/desktop/command-registry.mjs",
     "./documents": "./active-system/assets/desktop/document-operations.mjs",
     "./apps": "./active-system/assets/desktop/apps.mjs",
-    "./mount": "./active-system/assets/desktop/app-instance.mjs"
+    "./mount": "./active-system/assets/desktop/app-instance.mjs",
+    "./file-protocol": "./src/file-protocol.mjs"
   }
 }
