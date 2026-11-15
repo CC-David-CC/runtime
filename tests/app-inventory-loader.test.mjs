@@ -6,7 +6,9 @@ function catalog(sizes){const files=Object.fromEntries(sizes.map((bytes,i)=>[i?i
 for(const [label,sizes,allowed]of [
  ['loft-sized',[1,256*mib,100*mib],true],
  ['exact512',[1,256*mib,256*mib-1],true],
- ['over512',[1,256*mib,256*mib],false],
+ ['above512-within-approved-1GiB',[1,256*mib,256*mib],true],
+ ['exact1GiB',[256*mib,256*mib,256*mib,256*mib],true],
+ ['over1GiB',[256*mib,256*mib,256*mib,256*mib,1],false],
  ['single-file-over256',[1,256*mib+1],false],
  ['exact4096-files',Array(4096).fill(1),true],
  ['over4096-files',Array(4097).fill(1),false],
