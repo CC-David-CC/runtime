@@ -46,6 +46,7 @@ export function mountApp(module,host){
     if(!view||!(view.element instanceof HTMLElement)||!view.element.classList.contains('window-content')||typeof view.dispose!=='function'||typeof view.then==='function')throw Error('App API 2 requires { element, dispose() }');
     // Optional additive API: legacy apps continue to mount unchanged. The
     // session host validates lifecycle before relying on it.
-    return {element:view.element,signal:controller.signal,dispose,lifecycle:view.lifecycle,documentOperations};
+    return {element:view.element,signal:controller.signal,dispose,lifecycle:view.lifecycle,documentOperations,
+      ready:view.ready,inspect:view.inspect,execute:view.execute,requestClose:view.requestClose};
   }catch(error){dispose('Mount failed');throw error;}
 }
