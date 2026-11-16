@@ -9,6 +9,7 @@
     "./documents": "./active-system/assets/desktop/document-operations.mjs",
     "./apps": "./active-system/assets/desktop/apps.mjs",
     "./mount": "./active-system/assets/desktop/app-instance.mjs",
-    "./file-protocol": "./src/file-protocol.mjs"
+    "./file-protocol": "./src/file-protocol.mjs",
+    "./local-recovery": "./src/local-recovery.mjs"
   }
 }
