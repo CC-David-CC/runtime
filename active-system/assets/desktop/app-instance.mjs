@@ -47,6 +47,6 @@ export function mountApp(module,host){
     // Optional additive API: legacy apps continue to mount unchanged. The
     // session host validates lifecycle before relying on it.
     return {element:view.element,signal:controller.signal,dispose,lifecycle:view.lifecycle,documentOperations,
-      ready:view.ready,inspect:view.inspect,execute:view.execute,requestClose:view.requestClose};
+      ready:view.ready,inspect:view.inspect,execute:view.execute,requestClose:view.requestClose,focus:view.focus};
   }catch(error){dispose('Mount failed');throw error;}
 }
