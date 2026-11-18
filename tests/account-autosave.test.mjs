@@ -82,6 +82,16 @@ test('only known no-write errors can supply a retry delay, including long server
   f.scheduler.dispose();
 });
 
+test('re-enabling automatic writes keeps the existing server retry delay',async()=>{
+  const f=fixture(async()=>({status:'retry',retryAfterMs:75_000}));
+  f.observe();await f.tick(10_000);assert.equal(f.calls.length,1);
+  f.scheduler.pause('AutoSave turned off');
+  await f.tick(1000);f.scheduler.resume();
+  await f.tick(73_999);assert.equal(f.calls.length,1);
+  await f.tick(1);assert.equal(f.calls.length,2);
+  f.scheduler.dispose();
+});
+
 test('conflicts, uncertain responses and thrown network failures pause without automatic replay', async () => {
   for(const result of [()=>({status:'paused',reason:'conflict'}),()=>({status:'unknown'}),()=>{throw Error('response lost');}]) {
     const f=fixture(result);f.observe();await f.tick(10_000);assert.equal(f.scheduler.inspect().state,'paused');

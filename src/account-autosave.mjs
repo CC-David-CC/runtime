@@ -126,7 +126,7 @@ export function createAccountAutosave({save, onState = () => {},
       lastConfirmed = now(); failures = 0; retryAt = 0; pauseReason = null; schedule();
     },
     pause,
-    resume() { if (!disposed) {pauseReason = null; failures = 0; retryAt = 0; lastEdit = now(); schedule();} },
+    resume() { if (!disposed) {pauseReason = null; lastEdit = now(); schedule();} },
     inspect,
     dispose() { if (disposed) return; disposed = true; epoch++; cancelTimer(); abort.abort(); publish('disposed'); }
   });
