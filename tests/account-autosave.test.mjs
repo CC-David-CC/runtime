@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createAccountAutosave, ACCOUNT_AUTOSAVE_POLICY} from '../src/account-autosave.mjs';
+import {accountAutosaveRetry, createAccountAutosave, ACCOUNT_AUTOSAVE_POLICY} from '../src/account-autosave.mjs';
 
 const settle = async () => {for (let i=0; i<12; i++) await Promise.resolve();};
 function fixture(save = async () => ({status:'saved'}), random = () => 0) {
@@ -67,6 +67,19 @@ test('server Retry-After is respected and positive jitter never exceeds the retr
     await j.tick(1);assert.equal(j.calls.length,before+1);
   }
   j.scheduler.dispose();
+});
+
+test('only known no-write errors can supply a retry delay, including long server instructions',async()=>{
+  const message='Transfer allowance reached; try later', retryAfterMs=3_000_000_000;
+  const known={status:429,message,retryAfterMs};
+  assert.equal(accountAutosaveRetry({...known,outcome:'unknown'}),null);
+  assert.equal(accountAutosaveRetry({...known,message:'Unexplained 429'}),null);
+  assert.equal(accountAutosaveRetry({...known,status:503}),null);
+  const f=fixture(async()=>accountAutosaveRetry(known));f.observe();await f.tick(10_000);
+  assert.equal([...f.timers.values()][0].at,10_000+2_147_483_647);
+  await f.tick(retryAfterMs-1);assert.equal(f.calls.length,1);
+  await f.tick(1);assert.equal(f.calls.length,2);
+  f.scheduler.dispose();
 });
 
 test('conflicts, uncertain responses and thrown network failures pause without automatic replay', async () => {

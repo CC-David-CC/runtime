@@ -6,6 +6,17 @@ export const ACCOUNT_AUTOSAVE_POLICY = Object.freeze({
   retryBaseMs: 30_000, retryMaximumMs: 15 * 60_000
 });
 
+// Storage uses these two messages only when no mutation was dispatched or
+// admitted. Other 429/408/5xx responses do not establish a safe retry.
+export function accountAutosaveRetry(error) {
+  if(error?.outcome==='unknown'||error?.status!==429)return null;
+  if(![
+    'Too many pending account-file operations; wait for the current operations to finish',
+    'Transfer allowance reached; try later'
+  ].includes(error.message))return null;
+  return {status:'retry',reason:error.message,retryAfterMs:error.retryAfterMs};
+}
+
 // Bound automatic uploads across document views in this page. Manual Save and
 // browser recovery do not wait for this queue. Server admission remains final.
 let active = 0;
@@ -50,7 +61,14 @@ export function createAccountAutosave({save, onState = () => {},
     const due = Math.max(retryAt, lastConfirmed + config.minimumIntervalMs,
       Math.min(lastEdit + config.idleMs, dirtySince + config.maximumWaitMs));
     publish(failures ? 'retrying' : 'scheduled', due);
-    timer = setTimer(() => { timer = null; void run(); }, Math.max(0, due - now()));
+    // Browser timers store delays in a signed 32-bit millisecond value. A long
+    // server instruction can require several timers without allowing an early write.
+    const maximumTimerDelay = 2_147_483_647;
+    timer = setTimer(() => {
+      timer = null;
+      if(now()<due)schedule();
+      else void run();
+    }, Math.min(maximumTimerDelay, Math.max(0, due - now())));
   }
   async function run() {
     if (disposed || running || pauseReason || !current?.dirty || !current.eligible) return;
