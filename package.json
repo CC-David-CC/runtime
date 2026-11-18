@@ -10,6 +10,7 @@
     "./apps": "./active-system/assets/desktop/apps.mjs",
     "./mount": "./active-system/assets/desktop/app-instance.mjs",
     "./file-protocol": "./src/file-protocol.mjs",
-    "./local-recovery": "./src/local-recovery.mjs"
+    "./local-recovery": "./src/local-recovery.mjs",
+    "./account-autosave": "./src/account-autosave.mjs"
   }
 }
