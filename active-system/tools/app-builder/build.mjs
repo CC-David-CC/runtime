@@ -46,7 +46,18 @@ for(const id of selected){
   await regular(entry,[source]);
   let manifest={};
   try{await regular(path.join(appRoot,'app.json'),[appRoot]);manifest=JSON.parse(await readFile(path.join(appRoot,'app.json'),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
-  if(!manifest||Array.isArray(manifest)||Object.keys(manifest).some(key=>!['assets','workers','inject','patches'].includes(key)))throw Error('Invalid app.json fields');
+  if(!manifest||typeof manifest!=='object'||Array.isArray(manifest))throw Error('Invalid app.json for '+id);
+  const buildFields=['assets','workers','inject','patches'];
+  const appFields=['id','name','description','category','version','entry','window'];
+  const hasAppMetadata=appFields.some(key=>Object.hasOwn(manifest,key));
+  if(Object.keys(manifest).some(key=>!buildFields.includes(key)&&!appFields.includes(key)))throw Error('Invalid app.json fields for '+id);
+  // Educational games keep their own display metadata alongside packaging inputs.
+  // The explicit build selection still supplies the entry and the desktop owns window policy.
+  if(hasAppMetadata&&(manifest.id!==id||manifest.entry!=='index.mjs'||
+      appFields.filter(key=>key!=='window').some(key=>typeof manifest[key]!=='string')||
+      !manifest.window||typeof manifest.window!=='object'||Array.isArray(manifest.window))) {
+    throw Error('Invalid app metadata for '+id);
+  }
   if(manifest.workers!==undefined&&(!manifest.workers||typeof manifest.workers!=='object'||Array.isArray(manifest.workers)))throw Error('Invalid worker map');
   if(!Array.isArray(manifest.inject??[])||(manifest.inject??[]).length>8)throw Error('Invalid inject list');
   const inject=[];for(const file of manifest.inject??[]){if(typeof file!=='string'||!safeFile.test(file)||!/[.](?:mjs|js)$/.test(file))throw Error('Invalid injected source');inject.push(await regular(path.resolve(appRoot,file),[appRoot]));}
