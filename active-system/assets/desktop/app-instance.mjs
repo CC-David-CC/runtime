@@ -31,11 +31,12 @@ export function mountApp(module,host){
     return errors;
   }
   try{
-    const session = host.session?.(), owner = host.storage?.signedInSubject?.();
+    const currentOwner = host.storage?.workspaceOwner ?? host.storage?.signedInSubject;
+    const session = host.session?.(), owner = currentOwner?.();
     documentOperations = createDocumentOperations({
       signal: controller.signal,
       coordinator: documentCoordinator(session, owner),
-      valid: () => !disposed && host.session?.() === session && host.storage?.signedInSubject?.() === owner
+      valid: () => !disposed && host.session?.() === session && currentOwner?.() === owner
         && (!host.desktop?.windows || host.desktop.windows.includes(host.w))
     });
     const tools=host.tools&&{...host.tools};
