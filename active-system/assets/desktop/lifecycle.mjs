@@ -15,11 +15,11 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
   // be awaiting its callback. One owned operation spans checking + recovery;
   // stop is terminal and invalidates every continuation before touching the UI.
   let stopped=false,operation=null,timer,tick,epoch=null,notice=null,offset=0,failures=0,blocked=false,disconnected=initiallyDisconnected,acknowledged=null,previousFocus=null,healthy=false;
-  const startedAt=Date.now();let connectedOnce=false,offlineSeen=false;
+  const startedAt=Date.now();let connectedOnce=false,offlineSeen=false,offlineContinued=false;
   const priorInert=new Map();
   function block(value){
     if(blocked===value)return;blocked=value;document.documentElement.dataset.desktopBlocked=String(value);
-    if(value){previousFocus=document.activeElement;for(const root of roots()){if(root){priorInert.set(root,root.inert);root.inert=true;}}document.dispatchEvent(new Event('codi-desktop-blocked'));(retry.disabled?card:retry).focus();}
+    if(value){if(document.activeElement!==banner)previousFocus=document.activeElement;for(const root of roots()){if(root){priorInert.set(root,root.inert);root.inert=true;}}document.dispatchEvent(new Event('codi-desktop-blocked'));(retry.disabled?card:retry).focus();}
     else{for(const [root,was] of priorInert)root.inert=was;priorInert.clear();if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});}
   }
   function render(){
@@ -27,11 +27,21 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
     const restoring=operation?.phase==='recovering';
     const now=Date.now()/1000+offset,planned=notice&&notice.phase!=='cancelled'&&notice.expiresAt>now;
     const seconds=planned?Math.max(0,Math.ceil(notice.deadline-now)):0,due=planned&&(notice.phase==='active'||!seconds);
+    const canContinue=disconnected&&connectedOnce&&!initiallyDisconnected&&navigator.onLine===false&&!due&&!restoring;
+    if(!canContinue)offlineContinued=false;
+    if(offlineContinued){
+      layer.hidden=true;
+      banner.textContent='Offline · Reconnect options';banner.hidden=false;
+      block(false);
+      return;
+    }
     if(due||disconnected||restoring){
-      action.hidden=true;retry.hidden=false;retry.disabled=operation!==null;layer.hidden=false;block(true);banner.hidden=true;spinner.hidden=false;
+      action.textContent='Continue working offline';action.hidden=!canContinue;
+      retry.hidden=false;retry.disabled=operation!==null;layer.hidden=false;block(true);banner.hidden=true;spinner.hidden=false;
       title.textContent=due?'Server maintenance':'Connection interrupted';
       message.textContent='Keep this tab open while we reconnect. Unsaved work is still in this tab’s memory; it has not been saved to disk.';
       if(!hasRunningGuest())message.textContent='Waiting for the server. This page has not restored a previous Linux session. After a reload or browser crash, reopen your last saved files when the server returns. Unsaved work from an earlier tab was not automatically saved.';
+      if(canContinue)message.textContent='You can keep editing in this tab. Files saved on this device can sync when the connection returns.';
       if(restoring){title.textContent='Reconnecting your session';message.textContent='The server is back. Checking your session while keeping Linux and local drafts in this tab.';}
       clock.textContent=due?'Maintenance is in progress. We’ll keep trying.':'Trying again automatically…';
       if(!due&&!restoring&&!initiallyDisconnected&&!connectedOnce&&!offlineSeen&&navigator.onLine&&failures<2&&Date.now()-startedAt<15000){
@@ -50,13 +60,22 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
       }else layer.hidden=true;
     }
   }
-  action.addEventListener('click',()=>{acknowledged=notice?.id;layer.hidden=true;if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});});
+  action.addEventListener('click',()=>{
+    if(action.hidden)return;
+    if(blocked){
+      offlineContinued=true;
+      render();
+      return;
+    }
+    acknowledged=notice?.id;layer.hidden=true;
+    if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
+  });
   function requestPoll(){if(stopped||operation)return;clearTimeout(timer);poll();}
   retry.addEventListener('click',requestPoll);
-  banner.addEventListener('click',()=>{acknowledged=null;render();action.focus();});
+  banner.addEventListener('click',()=>{offlineContinued=false;acknowledged=null;render();(action.hidden?card:action).focus();});
   function guard(event){if(blocked&&!layer.contains(event.target)){event.preventDefault();event.stopImmediatePropagation();}}
   const guarded=['pointerdown','click','keydown','beforeinput','paste','drop'];for(const name of guarded)document.addEventListener(name,guard,true);
-  const unload=event=>{if(blocked||notice&&notice.phase!=='cancelled'){event.preventDefault();event.returnValue='';}};window.addEventListener('beforeunload',unload);
+  const unload=event=>{if(blocked||offlineContinued||notice&&notice.phase!=='cancelled'){event.preventDefault();event.returnValue='';}};window.addEventListener('beforeunload',unload);
   async function poll(){
     if(stopped||operation)return;
     const current={controller:new AbortController(),phase:'checking'};
@@ -98,7 +117,7 @@ export function startLifecycle({config,roots,getGuestLink=()=>true,hasRunningGue
     }
   }
   const offline=()=>{if(stopped)return;offlineSeen=true;disconnected=true;render();};window.addEventListener('offline',offline);
-  const online=requestPoll;window.addEventListener('online',online);
+  const online=()=>{render();requestPoll();};window.addEventListener('online',online);
   tick=setInterval(()=>{if(stopped)return;if(healthy){if(!getGuestLink())disconnected=true;else connectedOnce=true;}render();},250);render();poll();
   return {get state(){return {phase:stopped?'stopped':operation?.phase||'idle',blocked,disconnected,epoch,notice:notice?{id:notice.id,phase:notice.phase,deadline:notice.deadline}:null};},
     stop(){if(stopped)return;stopped=true;const pending=operation;operation=null;pending?.controller.abort();clearTimeout(timer);clearInterval(tick);block(false);for(const name of guarded)document.removeEventListener(name,guard,true);window.removeEventListener('offline',offline);window.removeEventListener('online',online);window.removeEventListener('beforeunload',unload);layer.remove();banner.remove();}};
