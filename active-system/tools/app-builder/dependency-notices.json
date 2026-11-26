@@ -413,5 +413,17 @@
     "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "source": "https://raw.githubusercontent.com/google-deepmind/mujoco/800a109a4bdd02cb60404d565db4ae16fb04a53b/LICENSE",
     "license": "Apache-2.0"
+  },
+  "javascript-natural-sort@0.7.1": {
+    "path": "notices/javascript-natural-sort-0.7.1.txt",
+    "sha256": "f72308adee173a6152c7d458cee3bec8964620c4c93f9a894583e36aae6d8abf",
+    "source": "https://registry.npmjs.org/javascript-natural-sort/-/javascript-natural-sort-0.7.1.tgz",
+    "license": "MIT"
+  },
+  "seedrandom@3.0.5": {
+    "path": "notices/seedrandom-3.0.5.txt",
+    "sha256": "54624bc262234371635aacf512f779e523fc06412869108d0758b71569f7c41a",
+    "source": "https://registry.npmjs.org/seedrandom/-/seedrandom-3.0.5.tgz",
+    "license": "MIT"
   }
 }
